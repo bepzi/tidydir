@@ -153,7 +153,7 @@ fn run() -> Result<()> {
     } else {
         // No subcommand; default action is to print any stale files
         match matches.value_of(ARG_SECS).unwrap().parse::<u64>() {
-            Ok(secs) => println!("{}", db.get_stale_files(&Duration::from_secs(secs))),
+            Ok(secs) => print!("{}", db.get_stale_files(&Duration::from_secs(secs))),
             Err(parse_err) => {
                 return Err(Error::U64Parse {
                     source: parse_err,

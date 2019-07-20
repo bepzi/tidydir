@@ -45,6 +45,24 @@ List all files and folders currently tracked by `tidydir`:
 tidydir list
 ```
 
+### Additional Integration
+
+`tidydir` won't be of much use if it's not being run; therefore, it's
+best to pair it with scripts that can call `tidydir` regularly and
+notify you when files and folders have become stale.
+
+On my machine I refresh the list of files in my `Downloads` folder
+every time I log in. Then, I send a notification if invoking `tidydir`
+results in any output.
+
+``` bash
+# ~/.bash_profile, sourced only once (each time I log in)
+tidydir track ~/Downloads/*
+if [ $(tidydir | wc -c) -gt 0 ]; then
+    notify-send "tidydir" "$(tidydir)"
+fi
+```
+
 ## Contributing
 
 ...is welcomed! Please submit any issues and pull requests, though all
