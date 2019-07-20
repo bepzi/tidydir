@@ -1,0 +1,20 @@
+[package]
+name = "tidydir"
+version = "0.3.0"
+authors = ["bepzi <dev.ben01189998819991197253@gmail.com>"]
+edition = "2018"
+
+publish = false
+description = "Keeps files from getting stale on your hard drive"
+repository = "https://github.com/bepzi/tidydir"
+license = "Apache-2.0"
+
+[dependencies]
+directories = "^2"
+serde = { version = "^1", features = ["derive"] }
+ron = "^0.5"
+clap = "^2"
+snafu = "^0.4"
+
+[dev-dependencies]
+pretty_assertions = "^0.6"
