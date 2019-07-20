@@ -18,7 +18,6 @@ const DB_NAME: &str = "database.ron";
 
 const SECS_PER_MIN: u64 = 60;
 const SECS_PER_DAY: u64 = SECS_PER_MIN * 1440;
-const STALE_THRESHOLD: Duration = Duration::from_secs(2 * SECS_PER_DAY);
 
 /// A mapping of file/folder paths to the first time they were
 /// encountered by the program.
@@ -102,14 +101,14 @@ impl Database {
             })
     }
 
-    pub fn get_stale_files(&self) -> StaleFiles<'_> {
+    pub fn get_stale_files(&self, threshold: &Duration) -> StaleFiles<'_> {
         let now = SystemTime::now();
         let stale: HashMap<&'_ Path, Duration> = self
             .data
             .iter()
             .filter_map(|(path, last_seen)| {
                 let since = now.duration_since(*last_seen).ok()?;
-                if since >= STALE_THRESHOLD {
+                if since > *threshold {
                     Some((path.as_ref(), since))
                 } else {
                     None

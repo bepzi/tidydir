@@ -4,9 +4,16 @@ use snafu::Snafu;
 // Standard library imports
 use std::io;
 use std::path::PathBuf;
+use std::str;
 
 #[derive(Debug, Snafu)]
 pub enum Error {
+    #[snafu(display("Argument '{}' couldn't be parsed into a u64: {}", arg, source))]
+    U64Parse {
+        source: <u64 as str::FromStr>::Err,
+        arg: String,
+    },
+
     #[snafu(display("Couldn't find a valid $HOME directory"))]
     InvalidHomeDir,
 

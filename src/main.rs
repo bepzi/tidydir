@@ -28,17 +28,28 @@ use clap::{
 
 // Standard library imports
 use std::path::PathBuf;
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
 
 const SUBCMD_TRACK: &str = "track";
 const SUBCMD_UNTRACK: &str = "untrack";
 const SUBCMD_LIST: &str = "list";
 
+const ARG_SECS: &str = "secs";
 const ARG_PATHS: &str = "paths";
 const ARG_ALL: &str = "all";
 
-fn main() -> Result<()> {
+const DEFAULT_STALE_THRESHOLD: &str = "172800"; // 2 days
+
+fn run() -> Result<()> {
     let matches = app_from_crate!()
+        .arg(
+            Arg::with_name(ARG_SECS)
+                .short(ARG_SECS.get(0..1).unwrap())
+                .help("Seconds until a file is considered \"stale\"")
+                .takes_value(true)
+                .value_name(&ARG_SECS.to_ascii_uppercase())
+                .default_value(&DEFAULT_STALE_THRESHOLD),
+        )
         .subcommand(
             SubCommand::with_name(SUBCMD_TRACK)
                 .about("Registers files and folders")
@@ -56,7 +67,6 @@ fn main() -> Result<()> {
                 .about("Unregisters files and folders")
                 .arg(
                     Arg::with_name(ARG_ALL)
-                        .short(ARG_ALL.get(0..1).unwrap())
                         .long(ARG_ALL)
                         .help("Unregisters all files and folders")
                         .takes_value(false),
@@ -142,9 +152,27 @@ fn main() -> Result<()> {
         println!("{}", db);
     } else {
         // No subcommand; default action is to print any stale files
-        println!("{}", db.get_stale_files());
+        match matches.value_of(ARG_SECS).unwrap().parse::<u64>() {
+            Ok(secs) => println!("{}", db.get_stale_files(&Duration::from_secs(secs))),
+            Err(parse_err) => {
+                return Err(Error::U64Parse {
+                    source: parse_err,
+                    arg: matches.value_of(ARG_SECS).unwrap().to_string(),
+                })
+            }
+        }
     }
 
     db.save()?;
     Ok(())
+}
+
+fn main() -> Result<()> {
+    ::std::process::exit(match run() {
+        Ok(_) => 0,
+        Err(e) => {
+            eprintln!("{}", e);
+            1
+        }
+    })
 }
