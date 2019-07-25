@@ -56,10 +56,14 @@ every time I log in. Then, I send a notification if invoking `tidydir`
 results in any output.
 
 ``` bash
-# ~/.bash_profile, sourced only once (each time I log in)
+# ~/.bash_profile, sourced at interactive login
 tidydir track ~/Downloads/*
+```
+
+``` bash
+# ~/.xprofile, sourced when the X server starts
 if [ $(tidydir | wc -c) -gt 0 ]; then
-    notify-send "tidydir" "$(tidydir)"
+    $(sleep 5 && notify-send "Stale Files" "$(tidydir)") &
 fi
 ```
 
