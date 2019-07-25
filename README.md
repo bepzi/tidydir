@@ -57,7 +57,9 @@ results in any output.
 
 ``` bash
 # ~/.bash_profile, sourced at interactive login
-tidydir track ~/Downloads/*
+if [ $(ls -l ~/Downloads | grep -v ^d | wc -l) -gt 1 ]; then
+    tidydir track ~/Downloads/*
+fi
 ```
 
 ``` bash
